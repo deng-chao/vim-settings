@@ -15,6 +15,7 @@ check_installed(){
   if [[ "$1" -ne "0" ]]; then
     echo "Failed to install $2, exit" && exit
   fi
+
 }
 
 
@@ -58,8 +59,11 @@ cp "$user_home_dir/vimrc" "$user_home_dir.vimrc"
 vim +VimEnter +PlugInstall +qall
 
 if [[ -d ~/.vim/plugged/YouCompleteMe/third_party/ycmd/cpp/ycm ]]; then
-  echo "YouCompleteMe plugin installed, download .ycm_extra_conf.py"
-#  wget https://raw.githubusercontent.com/alanxz/rabbitmq-c/master/.ycm_extra_conf.py -P ~/.vim/plugged/YouCompleteMe/third_party/ycmd/cpp/ycm
+  if [[ ! -f ~/.vim/plugged/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py ]]; then
+    echo "YouCompleteMe plugin installed, download .ycm_extra_conf.py"
+    wget https://raw.githubusercontent.com/alanxz/rabbitmq-c/master/.ycm_extra_conf.py -P ~/.vim/plugged/YouCompleteMe/third_party/ycmd/cpp/ycm
+  fi
+
   echo "compile YouCompleteMe enable clang support"
 #  ~/.vim/plugged/YouCompleteMe/install.py --clang-completer
 fi
