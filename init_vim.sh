@@ -18,10 +18,28 @@ check_installed(){
 
 }
 
+vim_major_version="$(vim --version | head -1 | cut -d ' ' -f 5 | cut -d '.' -f 1)"
+
+if [[ "$vim_major_version" -ne "8" ]]; then
+  sudo apt install ncurses-dev
+  wget https://github.com/vim/vim/archive/master.zip
+  unzip master.zip
+  cd vim-master
+  cd src/
+  ./configure
+  make 
+  make install
+  hash vim
+fi
 
 if [[ "$hasapt" ]]; then
 
   echo "using apt to install necessery dependency"
+  if [[ "$vim_major_version" -ne "8" ]]; then
+    sudo add-apt-repository ppa:jonathonf/vim
+    sudo apt update
+    sudo apt install vim
+  fi
 
   apt install libboost-all-dev
   check_installed $? "boost"
@@ -29,6 +47,7 @@ if [[ "$hasapt" ]]; then
   apt install ctags
   check_installed $? "ctags"
 
+  echo "dependency installed"
 
 elif [[ "$hasyum" ]]; then
 
@@ -49,13 +68,22 @@ else
    echo "not support"
 fi
 
+echo "aa"
+
 if [[ -e ~/.vimrc ]]; then
   time="$(date +%Y%m%d%H%M%S)"
   echo "rename current .vimrc file to .vimrc-$time.bak"
   mv "$user_home_dir.vimrc" "$user_home_dir.vimrc-"$time".bak"
 fi
-cp "$user_home_dir/vimrc" "$user_home_dir.vimrc"
 
+current_dir="$(pwd)"
+echo "$user_home_dir.vimrc"
+
+echo "$current_dir"
+
+cp "$current_dir/vimrc" "$user_home_dir/.vimrc"
+
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 vim +VimEnter +PlugInstall +qall
 
 if [[ -d ~/.vim/plugged/YouCompleteMe/third_party/ycmd/cpp/ycm ]]; then
