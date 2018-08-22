@@ -54,7 +54,11 @@ if [[ -e ~/.vimrc ]]; then
   echo "rename current .vimrc file to .vimrc-$time.bak"
   mv "$user_home_dir.vimrc" "$user_home_dir.vimrc-"$time".bak"
 fi
-cp "$user_home_dir/vimrc" "$user_home_dir.vimrc"
+
+current_dir="$(pwd)"
+cp "$current_dir/vimrc" "$user_home_dir/.vimrc"
+
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 vim +VimEnter +PlugInstall +qall
 
