@@ -2,7 +2,7 @@
 
 user_home_dir="$(echo ~)"
 
-hasapt="$(command -v apt)"
+hasapt="$(command -v apt-get)"
 hasyum="$(command -v yum)"
 hasbrew="$(command -v brew)"
 
