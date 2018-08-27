@@ -28,7 +28,7 @@ filetype off " required
 
 call plug#begin('~/.vim/plugged')
 
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'scrooloose/nerdtree'
 Plug 'universal-ctags/ctags'
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'skywind3000/asyncrun.vim'
@@ -43,7 +43,7 @@ filetype plugin indent on " required
 " ============================ NerdTree ===============================
 
 :map <F1> :NERDTreeToggle<CR>
-let g:NERDTreeMapPreview = "p"
+:map <F2> :NERDTreeFind<CR>
 
 " ============================ LeaderF ================================
 
@@ -51,7 +51,7 @@ let g:Lf_ShortcutF = '<c-p>'
 let g:Lf_ShortcutB = '<m-n>'
 
 noremap <c-e> :LeaderfMru<cr>
-noremap <c-o> :LeaderfFunction!<cr>
+noremap <c-F12> :LeaderfFunction!<cr>
 noremap <m-n> :LeaderfBuffer<cr>
 noremap <m-m> :LeaderfTag<cr>
 
@@ -132,4 +132,3 @@ let c = nr2char(1 + char2nr(c))
 endw
 
 set timeout ttimeoutlen=50
-

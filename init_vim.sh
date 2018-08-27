@@ -1,27 +1,40 @@
 #!/bin/bash
 
-user_home_dir="$(echo ~)"
+check_installed(){
+  if [[ "$1" -ne "0" ]]; then
+    echo "Failed to install $2, exit" && exit
+  fi
+}
+
+# append '/' to the end of path if the last char isn't '/'
+format_path(){
+    case $1 in
+        */) echo $1 ;;
+        *) echo "$1/" ;;
+    esac
+}
+
+user_home_dir="$(format_path "$(echo ~)")"
+echo "home dir: $user_home_dir"
+
+current_dir="$(format_path "$(pwd)")"
+echo "current dir: $current_dir"
 
 hasapt="$(command -v apt-get)"
 hasyum="$(command -v yum)"
 hasbrew="$(command -v brew)"
 
-if [ "$(id -u)" != "0" ]; then
-   echo "This script must be run as root, exit" 1>&2
-   exit 1
-fi
-
-check_installed(){
-  if [[ "$1" -ne "0" ]]; then
-    echo "Failed to install $2, exit" && exit
-  fi
-
-}
+#if [ "$(id -u)" != "0" ]; then
+#   echo "This script must be run as root, exit" 1>&2
+#   exit 1
+#fi
 
 vim_major_version="$(vim --version | head -1 | cut -d ' ' -f 5 | cut -d '.' -f 1)"
+vim8="$(test "$vim_major_version" -ne "8" )"
 
 if [[ "$vim_major_version" -ne "8" ]]; then
-  sudo apt install ncurses-dev
+  # -qq -o=Dpkg::Use-Pty=0 to avoid printing a lot of noisy log
+  sudo apt install -y -qq -o=Dpkg::Use-Pty=0 ncurses-dev
   wget https://github.com/vim/vim/archive/master.zip
   unzip master.zip
   cd vim-master
@@ -32,14 +45,13 @@ if [[ "$vim_major_version" -ne "8" ]]; then
   hash vim
 fi
 
-if [[ "$hasapt" ]]; then
+cd $current_dir
 
+if [[ "$hasapt" ]]; then
   echo "using apt to install necessery dependency"
-  if [[ "$vim_major_version" -ne "8" ]]; then
-    sudo add-apt-repository ppa:jonathonf/vim
-    sudo apt update
-    sudo apt install vim
-  fi
+
+  ! $vim8 && sudo apt-get install -y -qq -o=Dpkg::Use-Pty=0 liblua5.1-dev luajit libluajit-5.1 python-dev ruby-dev \
+   libperl-dev libncurses5-dev libatk1.0-dev libx11-dev libxpm-dev libxt-dev
 
   apt install libboost-all-dev
   check_installed $? "boost"
@@ -68,20 +80,13 @@ else
    echo "not support"
 fi
 
-echo "aa"
-
 if [[ -e ~/.vimrc ]]; then
   time="$(date +%Y%m%d%H%M%S)"
   echo "rename current .vimrc file to .vimrc-$time.bak"
   mv "$user_home_dir.vimrc" "$user_home_dir.vimrc-"$time".bak"
 fi
 
-current_dir="$(pwd)"
-echo "$user_home_dir.vimrc"
-
-echo "$current_dir"
-
-cp "$current_dir/vimrc" "$user_home_dir/.vimrc"
+cp "$current_dir""vimrc" "$user_home_dir""/.vimrc"
 
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 vim +VimEnter +PlugInstall +qall
